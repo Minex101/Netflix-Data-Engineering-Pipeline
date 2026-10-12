@@ -1,0 +1,13 @@
+{
+	"name": "AzureDatabricks",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7405617186461965.5.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/8f7f7ab0-a299-45fc-8670-5bd5f08f2ac1/resourceGroups/RG-Netflix/providers/Microsoft.Databricks/workspaces/netflix-adb"
+		}
+	}
+}

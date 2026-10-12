@@ -1,0 +1,217 @@
+{
+	"name": "pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "For All The Files",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Meta Data Variable",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.p_array",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy Data From Github",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_github",
+									"type": "DatasetReference",
+									"parameters": {
+										"file_name": {
+											"value": "@item().file_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sink",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder_name": {
+											"value": "@item().folder_name",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@item().file_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Github Meta Data",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://github.com/Minex101/Netflix-Data-Engineering-Pipeline/tree/main/Netflix%20Data"
+				}
+			},
+			{
+				"name": "Meta Data Variable",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Github Meta Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "githubmetadata",
+					"value": {
+						"value": "@activity('Github Meta Data').output.Response",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ELT Pipeline",
+				"type": "DatabricksJob",
+				"dependsOn": [
+					{
+						"activity": "For All The Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"jobId": {
+						"value": "401729584624895",
+						"type": "Expression"
+					},
+					"jobParameters": {
+						"ingested_date": {
+							"value": "@pipeline().parameters.silver_ingested_date",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"p_array": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"folder_name": "netflix_cast",
+						"file_name": "netflix_cast.csv"
+					},
+					{
+						"folder_name": "netflix_category",
+						"file_name": "netflix_category.csv"
+					},
+					{
+						"folder_name": "netflix_countries",
+						"file_name": "netflix_countries.csv"
+					},
+					{
+						"folder_name": "netflix_directors",
+						"file_name": "netflix_directors.csv"
+					},
+					{
+						"folder_name": "netflix_titles",
+						"file_name": "netflix_titles.csv"
+					}
+				]
+			},
+			"silver_ingested_date": {
+				"type": "string",
+				"defaultValue": "1950-01-11T11:36:30.64Z"
+			}
+		},
+		"variables": {
+			"githubmetadata": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-10-12T18:23:18Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

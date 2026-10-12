@@ -1,0 +1,15 @@
+{
+	"name": "adfete-netflix",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4db19a5c-33b3-42a3-b237-66d17824321e",
+		"tenantId": "ccdde451-2924-43c9-8471-8e97ed32f25b"
+	}
+}
