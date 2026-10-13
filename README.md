@@ -40,7 +40,6 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - Cast `show_id` to int, drop NULL/empty values, trim trailing commas/whitespace, drop duplicates.
 - **Insert-only MERGE** on `(show_id, value)`,  new pairs are inserted, existing pairs skipped → safe to reprocess the entire bronze history any number of times.
 
----
 
 ## Security - No Stored Secrets
 
@@ -48,8 +47,6 @@ There are **no credentials stored anywhere in this pipeline** - no storage keys,
 
 - Databricks reaches ADLS through the **Databricks Access Connector for Azure Storage**, which authenticates with its **Microsoft Entra ID managed identity**. Unity Catalog routes every `abfss://` read/write through the connector, so notebooks need no explicit credentials.
 - The connector's identity is granted **RBAC** (`Storage Blob Data Contributor`) on the storage account - access is governed by identity, not by shared secrets.
-
----
 
 ## Tech Stack
 
