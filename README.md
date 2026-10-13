@@ -42,6 +42,15 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 
 ---
 
+## Security - No Stored Secrets
+
+There are **no credentials stored anywhere in this pipeline** - no storage keys, no passwords, no tokens in code, in pipeline configs, or in Git.
+
+- Databricks reaches ADLS through the **Databricks Access Connector for Azure Storage**, which authenticates with its **Microsoft Entra ID managed identity**. Unity Catalog routes every `abfss://` read/write through the connector, so notebooks need no explicit credentials.
+- The connector's identity is granted **RBAC** (`Storage Blob Data Contributor`) on the storage account - access is governed by identity, not by shared secrets.
+
+---
+
 ## Tech Stack
 
 **Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
