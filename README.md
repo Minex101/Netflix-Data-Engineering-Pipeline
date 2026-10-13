@@ -3,7 +3,6 @@ An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (
 
 Built with **Azure Data Factory** (orchestration) + **Azure Databricks Jobs** (orchestration) + **Azure Databricks** (processing) + **Azure Data Lake Storage Gen2** (storage), with **Delta Lake** at every layer.
 
----
 ## Architecture
 
 <img width="1598" height="896" alt="image" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
@@ -40,6 +39,26 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - Cast `show_id` to int, drop NULL/empty values, trim trailing commas/whitespace, drop duplicates.
 - **Insert-only MERGE** on `(show_id, value)`,  new pairs are inserted, existing pairs skipped → safe to reprocess the entire bronze history any number of times.
 
+### 5. Gold - Star Schema (Spark Declarative Pipelines)
+
+The Gold layer reshapes the cleaned Silver data into a **star schema with bridge tables**, implemented as **PySpark Declarative Pipelines**, pipeline-managed materialized views that Databricks keeps fresh and validated automatically.
+
+**Surrogate keys** : every dimension gets a deterministic surrogate key via `xxhash64()` over its natural value, so keys are stable across refreshes.
+
+**Dimensions**
+
+| Table | Source | Notes |
+| --- | --- | --- |
+| `dim_show` | `silver.netflix_titles` | show_id, title, short_title, description |
+| `dim_date` | `silver.netflix_titles` | calendar dimension parsed from `date_added`, smart-key `yyyyMMdd` int, plus day / month / month_name / quarter / year |
+| `dim_category` | `silver.netflix_category` | distinct trimmed categories |
+| `dim_director` | `silver.netflix_directors` | distinct trimmed directors |
+| `dim_cast` | `silver.netflix_cast` | distinct trimmed cast members |
+| `dim_country` | `silver.netflix_countries` | distinct trimmed countries |
+
+**Bridge tables** : a show can have many cast members, directors, countries and categories (true many-to-many), so the fact connects to those dimensions through dedicated bridge views (`bridge_show_cast`, `bridge_show_director`, `bridge_show_country`, `bridge_show_category`) that resolve `show_id → surrogate key`.
+
+**Fact table** : `fact_show`: one row per show with the `DimDateKey` foreign key, type, rating, release_year, and durations.
 
 ## Security - No Stored Secrets
 
