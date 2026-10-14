@@ -12,8 +12,11 @@ An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (
 Built with **Azure Data Factory** (orchestration) + **Azure Databricks Jobs** (orchestration) + **Azure Databricks** (processing) + **Azure Data Lake Storage Gen2** (storage), with **Delta Lake** at every layer.
 
 ## Architecture
-
-<img width="1598" height="896" alt="image" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
+<p align="center">
+  <img width="1598" height="896" alt="End-to-end architecture: GitHub CSVs to ADLS Gen2 raw zone, Databricks Bronze, Silver and Gold layers, star schema for analytics" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
+  <br>
+  <em>Figure 1: End-to-end architecture, from GitHub source files through ADF and Databricks to the Gold star schema</em>
+</p>
 
 ## Pipeline Design & Implementation 
 ### 1. Orchestration - One Databricks Workflow Job
