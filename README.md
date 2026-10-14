@@ -9,7 +9,12 @@
 
 An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (titles, cast, directors, countries, categories) from GitHub into Azure, transforms it through a Bronze → Silver → Gold (medallion architecture), and serves it as a star schema for analytics.
 
-Built with **Azure Data Factory** (orchestration) + **Azure Databricks Jobs** (orchestration) + **Azure Databricks** (processing) + **Azure Data Lake Storage Gen2** (storage), with **Delta Lake** at every layer.
+## Tech Stack
+
+**Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
+**Databricks:** PySpark · Delta Lake · Auto Loader (`cloudFiles`) · Declarative Pipelines · Workflows · LakeFlow Jobs
+**Source:** GitHub (CSV) · 
+**Languages:** Python, SQL
 
 ## Architecture
 <p align="center">
@@ -87,13 +92,6 @@ There are **no credentials stored anywhere in this pipeline** - no storage keys,
 
 - Databricks reaches ADLS through the **Databricks Access Connector for Azure Storage**, which authenticates with its **Microsoft Entra ID managed identity**. Unity Catalog routes every `abfss://` read/write through the connector, so notebooks need no explicit credentials.
 - The connector's identity is granted **RBAC** (`Storage Blob Data Contributor`) on the storage account - access is governed by identity, not by shared secrets.
-
-## Tech Stack
-
-**Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
-**Databricks:** PySpark · Delta Lake · Auto Loader (`cloudFiles`) · Delta Live Tables · Workflows
-**Source:** GitHub (CSV) · 
-**Languages:** Python, SQL
 
 ## How It Works (TL;DR)
 
