@@ -7,7 +7,7 @@ Built with **Azure Data Factory** (orchestration) + **Azure Databricks Jobs** (o
 
 <img width="1598" height="896" alt="image" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
 
-### 2. Orchestration - One Databricks Workflow Job
+### 1. Orchestration - One Databricks Workflow Job
 
 ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally runs the full medallion chain as a **task DAG**, with Serverless compute.
 
@@ -17,7 +17,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - **Email notifications** are configured on the job, the team is alerted automatically on failure.
 - Serverless compute is used for the Silver transformation tasks, so no cluster management is needed and the job only pays for actual runtime.
 
-### 3. Bronze - Incremental Ingestion with Auto Loader
+### 2. Bronze - Incremental Ingestion with Auto Loader
 
 `Bronze_Autoloader` incrementally reads new files from the `raw` container using **Auto Loader** (`cloudFiles` with the directory listing mode):
 
@@ -25,7 +25,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - **Schema handling** : the schema is inferred on first load, cached in a per-table `SchemaLocation`, and evolved on change (`mergeSchema = true`), with malformed records rescued to `_rescued_data`.
 - Audit columns `_ingested_date` and `_file_modified` are added (titles table) to support downstream incremental processing.
 
-### 4. Silver - Cleaning, Deduplication & Upsert
+### 3. Silver - Cleaning, Deduplication & Upsert
 
 **`Silver_Netflix_Titles`** (SCD 1-style upsert, one row per `show_id`):
 
@@ -39,7 +39,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - Cast `show_id` to int, drop NULL/empty values, trim trailing commas/whitespace, drop duplicates.
 - **Insert-only MERGE** on `(show_id, value)`,  new pairs are inserted, existing pairs skipped → safe to reprocess the entire bronze history any number of times.
 
-### 5. Gold - Star Schema (Spark Declarative Pipelines)
+### 4. Gold - Star Schema (Spark Declarative Pipelines)
 
 The Gold layer reshapes the cleaned Silver data into a **star schema with bridge tables**, implemented as **PySpark Declarative Pipelines**, pipeline-managed materialized views that Databricks keeps fresh and validated automatically.
 
