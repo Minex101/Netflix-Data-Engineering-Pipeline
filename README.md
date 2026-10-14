@@ -7,11 +7,21 @@ Built with **Azure Data Factory** (orchestration) + **Azure Databricks Jobs** (o
 
 <img width="1598" height="896" alt="image" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
 
+## Pipeline Design & Implementation 
 ### 1. Orchestration - One Databricks Workflow Job
 
-ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally runs the full medallion chain as a **task DAG**, with Serverless compute.
+ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally runs the full medallion chain as a **task DAG** with Serverless compute.
 
-<img width="1972" height="465" alt="image" src="https://github.com/user-attachments/assets/b5fd134c-64ee-4f79-bb52-2d956dd80740" />
+<p align="center">
+  <img width="1066" height="270" alt="Azure Data Factory pipeline that triggers the Databricks ELT Pipeline job" src="https://github.com/user-attachments/assets/09177e2d-cd6e-4099-b5de-ba08746ca12e" />
+  <br>
+  <em>Figure 2: Azure Data Factory pipeline that triggers the Databricks job</em>
+</p>
+<p align="center">
+  <img width="1972" height="465" alt="Databricks Workflow job showing the task DAG for the medallion pipeline" src="https://github.com/user-attachments/assets/b5fd134c-64ee-4f79-bb52-2d956dd80740" />
+  <br>
+  <em>Figure 3: Databricks Workflow job (ELT Pipeline) triggered by ADF, running the medallion chain as a task DAG</em>
+</p>
 
 - Each task runs only after the upstream task succeeds; any failure stops the chain.
 - **Email notifications** are configured on the job, the team is alerted automatically on failure.
