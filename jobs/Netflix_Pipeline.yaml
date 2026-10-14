@@ -1,0 +1,38 @@
+resources:
+  jobs:
+    Netflix_Pipeline:
+      name: Netflix_Pipeline
+      email_notifications:
+        on_failure:
+          - affanmohd8khan@gmail.com
+      notification_settings:
+        no_alert_for_canceled_runs: true
+      tasks:
+        - task_key: Bronze_Incremental_Load
+          run_job_task:
+            job_id: 184750800612008
+        - task_key: Silver_Main_Table
+          depends_on:
+            - task_key: Bronze_Incremental_Load
+          notebook_task:
+            notebook_path: /Workspace/NetflixProject/Silver_Netflix_Titles
+            source: WORKSPACE
+        - task_key: Silver_Other_Tables
+          depends_on:
+            - task_key: Silver_Main_Table
+          notebook_task:
+            notebook_path: /Workspace/NetflixProject/Silver_Other_Tables
+            source: WORKSPACE
+        - task_key: Gold_Star_Schema
+          depends_on:
+            - task_key: Silver_Other_Tables
+          pipeline_task:
+            pipeline_id: aa33ef38-b721-431c-bcd7-27ce3068c6a2
+          max_retries: 1
+          min_retry_interval_millis: 120000
+      queue:
+        enabled: true
+      parameters:
+        - name: ingested_date
+          default: ""
+      performance_target: PERFORMANCE_OPTIMIZED

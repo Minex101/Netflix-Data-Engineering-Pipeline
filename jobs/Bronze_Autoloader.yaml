@@ -1,0 +1,25 @@
+resources:
+  jobs:
+    Bronze_Autoloader:
+      name: Bronze_Autoloader
+      tasks:
+        - task_key: Lookup_Locations
+          notebook_task:
+            notebook_path: /Workspace/NetflixProject/Parameters
+            source: WORKSPACE
+        - task_key: Silver_Notebook
+          depends_on:
+            - task_key: Lookup_Locations
+          for_each_task:
+            inputs: "{{tasks.Lookup_Locations.values.files_arr}}"
+            task:
+              task_key: Bronze_Autoloader
+              notebook_task:
+                notebook_path: /Workspace/NetflixProject/Bronze_Autoloader
+                base_parameters:
+                  source_folder: "{{input.source_folder}}"
+                  target_folder: "{{input.target_folder}}"
+                source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
