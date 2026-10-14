@@ -12,8 +12,11 @@ An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (
 ## Tech Stack
 
 **Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
+
 **Databricks:** PySpark · Delta Lake · Auto Loader (`cloudFiles`) · Declarative Pipelines · Workflows · LakeFlow Jobs
-**Source:** GitHub (CSV) · 
+
+**Source:** GitHub (CSV)
+
 **Languages:** Python, SQL
 
 ## Architecture
