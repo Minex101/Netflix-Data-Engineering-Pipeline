@@ -1,11 +1,11 @@
 # Netflix Data Engineering ELT Pipeline
 
-![Azure Data Factory](https://img.shields.io/badge/orchestration-Azure_Data_Factory-0078D4)
-![Databricks](https://img.shields.io/badge/processing-Azure_Databricks-FF3621)
-![Storage](https://img.shields.io/badge/storage-ADLS_Gen2-0078D4)
-![Delta Lake](https://img.shields.io/badge/format-Delta_Lake-00ADD8)
-![PySpark](https://img.shields.io/badge/language-PySpark-E25A1C)
-![SQL](https://img.shields.io/badge/language-SQL-4479A1)
+![Azure Data Factory](https://img.shields.io/badge/Azure%20Data%20Factory-0078D4?style=for-the-badge&logoColor=white)
+![Azure Databricks](https://img.shields.io/badge/Azure%20Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)
+![ADLS Gen2](https://img.shields.io/badge/ADLS%20Gen2-0078D4?style=for-the-badge&logoColor=white)
+![Delta Lake](https://img.shields.io/badge/Delta%20Lake-00ADD4?style=for-the-badge&logoColor=white)
+![PySpark](https://img.shields.io/badge/PySpark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logoColor=white)
 
 An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (titles, cast, directors, countries, categories) from GitHub into Azure, transforms it through a Bronze → Silver → Gold (medallion architecture), and serves it as a star schema for analytics.
 
