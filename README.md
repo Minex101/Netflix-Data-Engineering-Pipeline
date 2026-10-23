@@ -1,4 +1,4 @@
-# Netflix Data Engineering ELT Pipeline
+# 🎥 Netflix Data Engineering ELT Pipeline
 
 ![Azure Data Factory](https://img.shields.io/badge/Azure%20Data%20Factory-0078D4?style=for-the-badge&logoColor=white)
 ![Azure Databricks](https://img.shields.io/badge/Azure%20Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)
@@ -9,7 +9,7 @@
 
 An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (titles, cast, directors, countries, categories) from GitHub into Azure, transforms it through a Bronze → Silver → Gold (medallion architecture), and serves it as a star schema for analytics.
 
-## Tech Stack
+## ⚙️ Tech Stack
 
 **Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
 
@@ -19,7 +19,7 @@ An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (
 
 **Languages:** Python, SQL
 
-## Architecture
+## 🌇 Architecture
 <p align="center">
   <img width="1598" height="896" alt="End-to-end architecture: GitHub CSVs to ADLS Gen2 raw zone, Databricks Bronze, Silver and Gold layers, star schema for analytics" src="https://github.com/user-attachments/assets/3907a304-4ce9-4428-95c7-a01d9969e4e7" />
   <br>
@@ -27,7 +27,7 @@ An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (
 </p>
 
 ## Pipeline Design & Implementation 
-### 1. Orchestration - One Databricks Workflow Job
+### 1. 📊 Orchestration - One Databricks Workflow Job
 
 ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally runs the full medallion chain as a **task DAG** with Serverless compute.
 
@@ -46,7 +46,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - **Email notifications** are configured on the job, the team is alerted automatically on failure.
 - Serverless compute is used for the Silver transformation tasks, so no cluster management is needed and the job only pays for actual runtime.
 
-### 2. Bronze - Incremental Ingestion with Auto Loader
+### 2. 🥉 Bronze - Incremental Ingestion with Auto Loader
 
 `Bronze_Autoloader` incrementally reads new files from the `raw` container using **Auto Loader** (`cloudFiles` with the directory listing mode):
 
@@ -54,7 +54,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - **Schema handling** : the schema is inferred on first load, cached in a per-table `SchemaLocation`, and evolved on change (`mergeSchema = true`), with malformed records rescued to `_rescued_data`.
 - Audit columns `_ingested_date` and `_file_modified` are added (titles table) to support downstream incremental processing.
 
-### 3. Silver - Cleaning, Deduplication & Upsert
+### 3. 🥈 Silver - Cleaning, Deduplication & Upsert
 
 **`Silver_Netflix_Titles`** (SCD 1-style upsert, one row per `show_id`):
 
@@ -68,7 +68,7 @@ ADF makes a single call to one Databricks job (`ELT Pipeline`), which internally
 - Cast `show_id` to int, drop NULL/empty values, trim trailing commas/whitespace, drop duplicates.
 - **Insert-only MERGE** on `(show_id, value)`,  new pairs are inserted, existing pairs skipped → safe to reprocess the entire bronze history any number of times.
 
-### 4. Gold - Star Schema (Spark Declarative Pipelines)
+### 4. 🎖️ Gold - Star Schema (Spark Declarative Pipelines)
 
 The Gold layer reshapes the cleaned Silver data into a **star schema with bridge tables**, implemented as **PySpark Declarative Pipelines**, pipeline-managed materialized views that Databricks keeps fresh and validated automatically.
 
@@ -96,7 +96,7 @@ There are **no credentials stored anywhere in this pipeline** - no storage keys,
 - Databricks reaches ADLS through the **Databricks Access Connector for Azure Storage**, which authenticates with its **Microsoft Entra ID managed identity**. Unity Catalog routes every `abfss://` read/write through the connector, so notebooks need no explicit credentials.
 - The connector's identity is granted **RBAC** (`Storage Blob Data Contributor`) on the storage account - access is governed by identity, not by shared secrets.
 
-## How It Works (TL;DR)
+## ⚡ How It Works (TL;DR)
 
 ADF detects new CSVs in GitHub and lands them in the `raw` zone → Databricks Auto Loader incrementally ingests them into Bronze Delta tables → Silver notebooks clean, deduplicate, and upsert into curated tables → Delta Live Tables builds the Gold star schema, ready for BI and analytics.
 
