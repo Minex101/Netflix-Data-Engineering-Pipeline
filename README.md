@@ -1,5 +1,6 @@
 # 🎥 Netflix Data Engineering ELT Pipeline
 
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 ![Azure Data Factory](https://img.shields.io/badge/Azure%20Data%20Factory-0078D4?style=for-the-badge&logoColor=white)
 ![Azure Databricks](https://img.shields.io/badge/Azure%20Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white)
 ![ADLS Gen2](https://img.shields.io/badge/ADLS%20Gen2-0078D4?style=for-the-badge&logoColor=white)
@@ -7,9 +8,12 @@
 ![PySpark](https://img.shields.io/badge/PySpark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logoColor=white)
 
-An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (titles, cast, directors, countries, categories) from GitHub into Azure, transforms it through a Bronze → Silver → Gold (medallion architecture), and serves it as a star schema for analytics.
+
+An end-to-end, metadata-driven data pipeline that ingests Netflix catalog data (titles, cast, directors, countries, categories) from GitHub into Azure, transforms it through a Bronze → Silver → Gold (medallion architecture), and serves it as a star schema visualised in a Power BI dashboard.
 
 ## ⚙️ Tech Stack
+
+**Analytics:** Power BI · DAX
 
 **Azure:** Data Factory · Data Lake Storage Gen2 · Databricks · Unity Catalog
 
@@ -88,6 +92,27 @@ The Gold layer reshapes the cleaned Silver data into a **star schema with bridge
 **Bridge tables** : a show can have many cast members, directors, countries and categories (true many-to-many), so the fact connects to those dimensions through dedicated bridge views (`bridge_show_cast`, `bridge_show_director`, `bridge_show_country`, `bridge_show_category`) that resolve `show_id → surrogate key`.
 
 **Fact table** : `fact_show`: one row per show with the `DimDateKey` foreign key, type, rating, release_year, and durations.
+
+### 5. 📈 Analytics - Power BI Dashboard
+
+The Gold star schema feeds a **two-page Power BI report**, with Type, Genre and Year slicers synced across both pages.
+
+<p align="center">
+  <img width="1677" height="1037" alt="Power BI Overview page" src="https://github.com/user-attachments/assets/b75aff4b-3bbb-496c-9015-746e1144b0ae" />
+  <br>
+  <em>Figure 4: Overview page - KPI cards (avg movie length, avg TV seasons, countries, genres), titles added per year, maturity ratings, top 10 genres, movies vs TV shows and top 10 countries</em>
+</p>
+
+<p align="center">
+  <img width="1674" height="1035" alt="Power BI Talent and Titles page" src="https://github.com/user-attachments/assets/4e6f5c7f-19ad-4fe1-8cda-000a7be047f4" />
+  <br>
+  <em>Figure 5: Talent & Titles page - top 10 directors and cast members, plus a title explorer listing every show with its type, release year, rating, date added and description</em>
+</p>
+
+**Semantic model**
+
+- The Gold tables are loaded **as-is**: no cleaning happens in Power Query, because all transformation is done upstream in the pipeline.
+- Relationships mirror the star schema. **Bridge → fact** relationships use **bidirectional** cross-filtering so genre, country, cast and director selections reach `fact_show`; all others are single-direction.
 
 ## Security - No Stored Secrets
 
