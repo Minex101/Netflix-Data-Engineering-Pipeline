@@ -123,6 +123,6 @@ There are **no credentials stored anywhere in this pipeline** - no storage keys,
 
 ## ⚡ How It Works (TL;DR)
 
-ADF detects new CSVs in GitHub and lands them in the `raw` zone → Databricks Auto Loader incrementally ingests them into Bronze Delta tables → Silver notebooks clean, deduplicate, and upsert into curated tables → Delta Live Tables builds the Gold star schema, ready for BI and analytics.
+ADF detects new CSVs in GitHub and lands them in the `raw` zone → Databricks Auto Loader incrementally ingests them into Bronze Delta tables → Silver notebooks clean, deduplicate, and upsert into curated tables → Declarative Pipelines build the Gold star schema → a Power BI dashboard serves it for analysis..
 
 ---
